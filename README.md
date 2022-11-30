@@ -1,6 +1,7 @@
 ## Advent of Code 2022 Solutions in Kotlin
 
 [![license](https://img.shields.io/github/license/colinodell/advent-2022)]()
+[![Build](https://github.com/colinodell/advent-2022/actions/workflows/build.yml/badge.svg)](https://github.com/colinodell/advent-2022/actions/workflows/build.yml)
 
 This repo is my personal attempt at solving the [Advent of Code 2022](http://adventofcode.com/2022) set of problems with the Kotlin programming language.
 
