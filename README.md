@@ -1,25 +1,16 @@
-# advent-2022
+## Advent of Code 2022 Solutions in Kotlin
 
-Welcome to the Advent of Code[^aoc] Kotlin project created by [colinodell][github] using the [Advent of Code Kotlin Template][template] delivered by JetBrains.
+[![license](https://img.shields.io/github/license/colinodell/advent-2022)]()
 
-In this repository, colinodell is about to provide solutions for the puzzles using [Kotlin][kotlin] language.
+This repo is my personal attempt at solving the [Advent of Code 2022](http://adventofcode.com/2022) set of problems with the Kotlin programming language.
 
-If you're stuck with Kotlin-specific questions or anything related to this template, check out the following resources:
+Past years, in other languages:
+ * [2015 - Golang](https://github.com/colinodell/advent-2015)
+ * [2017 - PHP](https://github.com/colinodell/advent-2017)
+ * [2018 - JavaScript](https://github.com/colinodell/advent-2018)
+ * [2019 - Golang](https://github.com/colinodell/advent-2019)
+ * [2020 - Golang](https://github.com/colinodell/advent-2020)
+ * [2021 - Kotlin](https://github.com/colinodell/advent-2021)
 
-- [Kotlin docs][docs]
-- [Kotlin Slack][slack]
-- Template [issue tracker][issues]
-
-
-[^aoc]:
-    [Advent of Code][aoc] – An annual event of Christmas-oriented programming challenges started December 2015.
-    Every year since then, beginning on the first day of December, a programming puzzle is published every day for twenty-five days.
-    You can solve the puzzle and provide an answer using the language of your choice.
-
-[aoc]: https://adventofcode.com
-[docs]: https://kotlinlang.org/docs/home.html
-[github]: https://github.com/colinodell
-[issues]: https://github.com/kotlin-hands-on/advent-of-code-kotlin-template/issues
-[kotlin]: https://kotlinlang.org
-[slack]: https://surveys.jetbrains.com/s3/kotlin-slack-sign-up
-[template]: https://github.com/kotlin-hands-on/advent-of-code-kotlin-template
+All solutions in this repository are originals unless otherwise noted
+Copyright &copy; 2022 by Colin O'Dell.
