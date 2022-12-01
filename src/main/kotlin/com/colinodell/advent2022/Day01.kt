@@ -1,18 +1,17 @@
 package com.colinodell.advent2022
 
-class Day01(private val input: String) {
+class Day01(private val input: List<String>) {
     fun solvePart1(): Int {
         return input
-            .split("\n\n")
-            .map { it.split("\n").map { it.toInt() } }
-            .maxOf { it.sum() }
+            .chunkedBy { it.isEmpty() }
+            .map { it.sumOf { it.toInt() } }
+            .max()
     }
 
     fun solvePart2(): Int {
         return input
-            .split("\n\n")
-            .map { it.split("\n").map { it.toInt() } }
-            .map { it.sum() }
+            .chunkedBy { it.isEmpty() }
+            .map { it.sumOf { it.toInt() } }
             .sortedDescending()
             .take(3)
             .sum()
