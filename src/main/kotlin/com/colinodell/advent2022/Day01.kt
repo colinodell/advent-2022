@@ -5,14 +5,10 @@ class Day01(input: List<String>) {
         .chunkedBy { it.isEmpty() }
         .map { it.sumOf { it.toInt() } }
 
-    fun solvePart1(): Int {
-        return elfCalories.max()
-    }
+    fun solvePart1() = elfCalories.max()
 
-    fun solvePart2(): Int {
-        return elfCalories
-            .sortedDescending()
-            .take(3)
-            .sum()
-    }
+    fun solvePart2() = elfCalories
+        .sortedDescending()
+        .take(3)
+        .sum()
 }
