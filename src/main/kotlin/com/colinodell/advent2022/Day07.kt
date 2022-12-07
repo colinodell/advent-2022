@@ -18,61 +18,47 @@ class Day07(input: List<String>) {
                 if (parts[0] == "dir") {
                     Directory(parts[1], currentDir)
                 } else {
-                    File(parts[1], parts[0].toInt(), currentDir)
+                    currentDir.addFile(parts[0].toInt())
                 }
             }
         }
     }
 
-    fun solvePart1() = iterateFilesystem(root)
-        .filterIsInstance<Directory>()
-        .filter { it.size <= 100000 }
-        .sumOf { it.size }
+    fun solvePart1() = iterateDirectories(root)
+        .filter { it.fileSize() <= 100000 }
+        .sumOf { it.fileSize() }
 
     fun solvePart2(): Int {
-        val freeSpace = 70000000 - root.size
+        val freeSpace = 70000000 - root.fileSize()
         val neededSpace = 30000000
 
-        return iterateFilesystem(root)
-            .filterIsInstance<Directory>()
-            .filter { freeSpace + it.size >= neededSpace }
-            .sortedBy { it.size }
+        return iterateDirectories(root)
+            .filter { freeSpace + it.fileSize() >= neededSpace }
+            .sortedBy { it.fileSize() }
             .first()
-            .size
+            .fileSize()
     }
 
-    interface FilesystemObject {
-        val name: String
-        val size: Int
-        val parent: Directory?
-    }
+    class Directory(private val name: String, val parent: Directory?) {
+        val children = mutableMapOf<String, Directory>()
+        private var fileSize: Int = 0
 
-    class File(override val name: String, override val size: Int, override val parent: Directory) : FilesystemObject {
-        init {
-            parent.children[name] = this
-        }
-    }
-
-    class Directory(override val name: String, override val parent: Directory?) : FilesystemObject {
         init {
             parent?.children?.set(name, this)
         }
 
-        val children = mutableMapOf<String, FilesystemObject>()
+        fun addFile(size: Int) {
+            fileSize += size
+        }
 
-        override val size: Int
-            get() = children.values.sumOf { it.size }
+        fun fileSize(): Int = fileSize + children.values.sumOf { it.fileSize() }
     }
 
-    private fun iterateFilesystem(root: FilesystemObject): Sequence<FilesystemObject> {
-        // Recursively iterate the filesystem
+    private fun iterateDirectories(root: Directory): Sequence<Directory> {
         return sequence {
             yield(root)
-
-            if (root is Directory) {
-                for (child in root.children.values) {
-                    yieldAll(iterateFilesystem(child))
-                }
+            for (child in root.children.values) {
+                yieldAll(iterateDirectories(child))
             }
         }
     }
