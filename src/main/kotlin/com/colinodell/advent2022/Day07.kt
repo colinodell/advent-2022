@@ -1,23 +1,20 @@
 package com.colinodell.advent2022
 
 class Day07(input: List<String>) {
-    private val root = Directory("/", null)
+    private val root = Directory()
 
     init {
         var currentDir = root
         // Assume the first line is the root, so skip it
         for (line in input.drop(1)) {
             val parts = line.split(" ")
-            if (line == "$ cd ..") {
-                currentDir = currentDir.parent!!
-            } else if (parts[0] == "$" && parts[1] == "cd") {
-                currentDir = currentDir.children[parts[2]] as Directory
-            } else if (parts[0] == "$" && parts[1] == "ls") {
-                // no-op
-            } else if (parts.size == 2 && parts[0] == "dir") {
-                Directory(parts[1], currentDir)
-            } else if (parts.size == 2) {
-                currentDir.fileSize += parts[0].toInt()
+            when (true) {
+                line == "$ cd .." -> currentDir = currentDir.parent!!
+                parts[1] == "cd" -> currentDir = currentDir.children[parts[2]] as Directory
+                parts[1] == "ls" -> null // no-op
+                parts[0] == "dir" -> currentDir.addChild(parts[1])
+                parts.size == 2 -> currentDir.fileSize += parts[0].toInt()
+                else -> throw IllegalArgumentException("Unknown operation: $line")
             }
         }
     }
@@ -37,12 +34,12 @@ class Day07(input: List<String>) {
             .totalSize()
     }
 
-    class Directory(private val name: String, val parent: Directory?) {
+    class Directory(val parent: Directory? = null) {
         val children = mutableMapOf<String, Directory>()
         var fileSize: Int = 0
 
-        init {
-            parent?.children?.set(name, this)
+        fun addChild(name: String) {
+            children[name] = Directory(this)
         }
 
         fun totalSize(): Int = fileSize + children.values.sumOf { it.totalSize() }
