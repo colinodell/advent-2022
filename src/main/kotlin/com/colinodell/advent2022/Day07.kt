@@ -14,44 +14,38 @@ class Day07(input: List<String>) {
                 currentDir = currentDir.children[parts[2]] as Directory
             } else if (parts[0] == "$" && parts[1] == "ls") {
                 // no-op
+            } else if (parts.size == 2 && parts[0] == "dir") {
+                Directory(parts[1], currentDir)
             } else if (parts.size == 2) {
-                if (parts[0] == "dir") {
-                    Directory(parts[1], currentDir)
-                } else {
-                    currentDir.addFile(parts[0].toInt())
-                }
+                currentDir.fileSize += parts[0].toInt()
             }
         }
     }
 
     fun solvePart1() = iterateDirectories(root)
-        .filter { it.fileSize() <= 100000 }
-        .sumOf { it.fileSize() }
+        .filter { it.totalSize() <= 100000 }
+        .sumOf { it.totalSize() }
 
     fun solvePart2(): Int {
-        val freeSpace = 70000000 - root.fileSize()
+        val freeSpace = 70000000 - root.totalSize()
         val neededSpace = 30000000
 
         return iterateDirectories(root)
-            .filter { freeSpace + it.fileSize() >= neededSpace }
-            .sortedBy { it.fileSize() }
+            .filter { freeSpace + it.totalSize() >= neededSpace }
+            .sortedBy { it.totalSize() }
             .first()
-            .fileSize()
+            .totalSize()
     }
 
     class Directory(private val name: String, val parent: Directory?) {
         val children = mutableMapOf<String, Directory>()
-        private var fileSize: Int = 0
+        var fileSize: Int = 0
 
         init {
             parent?.children?.set(name, this)
         }
 
-        fun addFile(size: Int) {
-            fileSize += size
-        }
-
-        fun fileSize(): Int = fileSize + children.values.sumOf { it.fileSize() }
+        fun totalSize(): Int = fileSize + children.values.sumOf { it.totalSize() }
     }
 
     private fun iterateDirectories(root: Directory): Sequence<Directory> {
