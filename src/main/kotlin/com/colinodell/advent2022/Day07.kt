@@ -9,11 +9,11 @@ class Day07(input: List<String>) {
         for (line in input.drop(1)) {
             val parts = line.split(" ")
             when (true) {
-                line == "$ cd .." -> currentDir = currentDir.parent!!
-                parts[1] == "cd" -> currentDir = currentDir.children[parts[2]] as Directory
-                parts[1] == "ls" -> null // no-op
-                parts[0] == "dir" -> currentDir.addChild(parts[1])
-                parts.size == 2 -> currentDir.fileSize += parts[0].toInt()
+                (line == "$ cd ..") -> currentDir = currentDir.parent!!
+                (parts[1] == "cd") -> currentDir = currentDir.children[parts[2]] as Directory
+                (parts[1] == "ls") -> null // no-op
+                (parts[0] == "dir") -> currentDir.addChild(parts[1])
+                (parts.size == 2) -> currentDir.fileSize += parts[0].toInt()
                 else -> throw IllegalArgumentException("Unknown operation: $line")
             }
         }
