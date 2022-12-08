@@ -6,20 +6,33 @@ import org.junit.jupiter.api.Test
 
 class ExtensionsTest {
     @Nested
-    inner class StopOnceTests {
+    inner class CountUntilTests {
         @Test
-        fun `returns empty sequence given an empty input`() {
-            Assertions.assertThat(sequenceOf<Int>().stopOnce { false }.toList()).isEmpty()
+        fun `returns 0 given an empty input`() {
+            Assertions.assertThat(sequenceOf<Int>().countUntil { false }).isEqualTo(0)
         }
 
         @Test
-        fun `returns all item if predicate always returns false`() {
-            Assertions.assertThat(sequenceOf(1, 2, 3).stopOnce { false }.toList()).containsExactly(1, 2, 3)
+        fun `counts all items if predicate always returns false`() {
+            Assertions.assertThat(sequenceOf(1, 2, 3).countUntil { false }).isEqualTo(3)
         }
 
         @Test
-        fun `returns all items through the first match`() {
-            Assertions.assertThat(sequenceOf(1, 2, 3).stopOnce { it == 2 }.toList()).containsExactly(1, 2)
+        fun `counts all items through the first match`() {
+            Assertions.assertThat(sequenceOf(1, 2, 3).countUntil { it == 2 }).isEqualTo(2)
+        }
+    }
+
+    @Nested
+    inner class ProductOfTests {
+        @Test
+        fun `returns 1 given an empty input`() {
+            Assertions.assertThat(listOf<Int>().productOf { it }).isEqualTo(1)
+        }
+
+        @Test
+        fun `returns the product of all items`() {
+            Assertions.assertThat(listOf(1, 2, 3).productOf { it }).isEqualTo(6)
         }
     }
 }

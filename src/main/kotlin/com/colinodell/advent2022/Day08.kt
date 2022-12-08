@@ -7,26 +7,30 @@ import com.colinodell.advent2021.toGrid
 class Day08(input: List<String>) {
     private val grid = input.toGrid { it.digitToInt() }
 
-    companion object {
-        private val NORTH = Vector2(0, -1)
-        private val SOUTH = Vector2(0, 1)
-        private val EAST = Vector2(1, 0)
-        private val WEST = Vector2(-1, 0)
-    }
+    private val directions = listOf(
+        Vector2(1, 0), // right
+        Vector2(0, 1), // down
+        Vector2(-1, 0), // left
+        Vector2(0, -1), // up
+    )
 
+    /**
+     * Count the number of tress where, in at least one direction, there's nothing taller than the current tree
+     */
     fun solvePart1() = grid.count { (pos, height) ->
-        grid.pointsToThe(NORTH, pos).none { it.value!! >= height } ||
-            grid.pointsToThe(SOUTH, pos).none { it.value!! >= height } ||
-            grid.pointsToThe(EAST, pos).none { it.value!! >= height } ||
-            grid.pointsToThe(WEST, pos).none { it.value!! >= height }
+        directions.any { dir ->
+            grid.pointsToThe(dir, pos).none { it.value!! >= height }
+        }
     }
 
+    /**
+     * Find the maximum value of the scenic score for each tree
+     *
+     * The scenic score is the product of trees visible in each cardinal direction
+     */
     fun solvePart2() = grid.maxOf { (pos, height) ->
-        listOf(
-            grid.pointsToThe(NORTH, pos).stopOnce { it.value!! >= height }.count(),
-            grid.pointsToThe(SOUTH, pos).stopOnce { it.value!! >= height }.count(),
-            grid.pointsToThe(EAST, pos).stopOnce { it.value!! >= height }.count(),
-            grid.pointsToThe(WEST, pos).stopOnce { it.value!! >= height }.count()
-        ).reduce(Int::times)
+        directions.productOf { dir ->
+            grid.pointsToThe(dir, pos).countUntil { it.value!! >= height }
+        }
     }
 }
