@@ -9,3 +9,15 @@ fun <T> Iterable<T>.chunkedBy(separator: (T) -> Boolean): List<List<T>> =
         }
         acc
     }
+
+/**
+ * Like takeWhile(), except that it stops AFTER the first matching element.
+ */
+fun <T> Sequence<T>.stopOnce(predicate: (T) -> Boolean) = sequence {
+    for (t in this@stopOnce) {
+        yield(t)
+        if (predicate(t)) {
+            break
+        }
+    }
+}
