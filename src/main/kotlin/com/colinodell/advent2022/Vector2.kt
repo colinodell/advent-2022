@@ -1,4 +1,4 @@
-package com.colinodell.advent2021
+package com.colinodell.advent2022
 
 import kotlin.math.abs
 

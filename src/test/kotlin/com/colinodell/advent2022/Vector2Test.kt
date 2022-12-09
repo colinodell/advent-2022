@@ -1,4 +1,4 @@
-package com.colinodell.advent2021
+package com.colinodell.advent2022
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName

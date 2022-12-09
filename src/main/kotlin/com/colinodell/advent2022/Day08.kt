@@ -1,9 +1,5 @@
 package com.colinodell.advent2022
 
-import com.colinodell.advent2021.Vector2
-import com.colinodell.advent2021.pointsToThe
-import com.colinodell.advent2021.toGrid
-
 class Day08(input: List<String>) {
     private val grid = input.toGrid { it.digitToInt() }
 
