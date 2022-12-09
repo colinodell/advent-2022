@@ -25,3 +25,5 @@ fun <T> Sequence<T>.countUntil(predicate: (T) -> Boolean): Int {
 }
 
 fun <T> Iterable<T>.productOf(predicate: (T) -> Int) = fold(1) { acc, t -> acc * predicate(t) }
+
+fun Int.clamp(min: Int, max: Int) = maxOf(min, minOf(max, this))

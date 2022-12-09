@@ -1,7 +1,15 @@
 package com.colinodell.advent2021
 
+import kotlin.math.abs
+
 data class Vector2(val x: Int, val y: Int) {
     operator fun plus(other: Vector2) = Vector2(x + other.x, y + other.y)
+
+    operator fun minus(other: Vector2) = Vector2(x - other.x, y - other.y)
+
+    fun normalize() = Vector2(x.clamp(-1, 1), y.clamp(-1, 1))
+
+    fun isTouching(other: Vector2) = abs(x - other.x) <= 1 && abs(y - other.y) <= 1
 
     override fun toString() = "($x, $y)"
 }
