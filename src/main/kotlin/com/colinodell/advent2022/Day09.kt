@@ -8,45 +8,43 @@ class Day09(input: List<String>) {
         "D" to Vector2(0, 1),
     )
 
-    private val steps = input.map {
-        val parts = it.split(" ")
-        Pair(directions[parts[0]]!!, parts[1].toInt())
-    }
-
-    fun solvePart1() = follow(headKnot, 1).distinct().count()
-    fun solvePart2() = follow(headKnot, 9).distinct().count()
-
-    private val headKnot = sequence {
+    /**
+     * Generate a sequence of all points the head knot passes through
+     */
+    private val headKnotPositions = sequence {
         var pos = Vector2(0, 0)
         yield(pos)
 
-        for (step in steps) {
-            repeat(step.second) {
-                pos += step.first
+        for (line in input) {
+            val (dir, count) = line.split(" ")
+            repeat(count.toInt()) {
+                pos += directions[dir]!!
                 yield(pos)
             }
         }
     }
 
-    /**
-     * Generate a rope with (followerCount+1) knots and follow the tail knot
-     */
-    private fun follow(headKnotPositions: Sequence<Vector2>, followerCount: Int) = sequence {
-        var seq = headKnotPositions
-        repeat(followerCount) {
-            seq = follow(seq)
-        }
-        yieldAll(seq)
-    }
+    fun solvePart1() = solveFor(2)
+    fun solvePart2() = solveFor(10)
 
     /**
-     * Generate a sequence of positions to follow the given knot
+     * Count the number of distinct points the tail knot passes through
      */
-    private fun follow(positions: Sequence<Vector2>) = sequence {
+    private fun solveFor(knotCount: Int) = createRope(knotCount).last().distinct().count()
+
+    /**
+     * Create a sequence where each subsequent knot follows the one before it
+     */
+    private fun createRope(knotCount: Int) = generateSequence(headKnotPositions) { follow(it) }.take(knotCount)
+
+    /**
+     * Follow the given knot, yielding the points it passes through
+     */
+    private fun follow(leadingKnot: Sequence<Vector2>) = sequence {
         var followerPos = Vector2(0, 0)
         yield(followerPos)
 
-        for (leadPos in positions) {
+        for (leadPos in leadingKnot) {
             while (!followerPos.isTouching(leadPos)) {
                 // Move towards the head position one step at a time
                 followerPos += (leadPos - followerPos).normalize()
