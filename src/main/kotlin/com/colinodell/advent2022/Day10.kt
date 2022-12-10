@@ -11,9 +11,9 @@ class Day10(input: String) {
 
     fun solvePart1() = registerValues
         .let { listOf(0) + it } // Add a 0 at the beginning so everything is 1-indexed
-        .filterIndexed { cycle, _ -> cycle % 40 == 20 } // Only take the cycles we're interested in
-        .mapIndexed { i, x -> x * (i * 40 + 20) } // Calculate the signal strength
-        .sum()
+        .withIndex() // Knowing the original index makes the following steps cleaner
+        .filter { it.index % 40 == 20 } // Only take the cycles we care about
+        .sumOf { it.value * it.index } // Calculate and sum the signal strengths
 
     fun solvePart2() = registerValues
         .mapIndexed { cycle, x -> abs((cycle % 40) - x) < 2 } // Should the pixel be lit?
