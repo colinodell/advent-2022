@@ -2,16 +2,10 @@ package com.colinodell.advent2022
 
 import kotlin.math.abs
 
-class Day10(input: List<String>) {
+class Day10(input: String) {
     private val registerValues = input
-        .flatMap {
-            val parts = it.split(" ")
-            if (parts[0] == "noop") {
-                listOf(0)
-            } else {
-                listOf(0, parts[1].toInt())
-            }
-        }
+        .split(" ", "\n")
+        .map { it.toIntOrNull() ?: 0 }
         .scan(1, Int::plus)
         .dropLast(1)
 
