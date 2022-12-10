@@ -11,8 +11,8 @@ class Day10(input: String) {
 
     fun solvePart1() = registerValues
         .let { listOf(0) + it } // Add a 0 at the beginning so everything is 1-indexed
-        .mapIndexed { cycle, x -> cycle * x } // Calculate the signal strength for every cycle
         .filterIndexed { cycle, _ -> cycle % 40 == 20 } // Only take the cycles we're interested in
+        .mapIndexed { i, x -> x * (i * 40 + 20) } // Calculate the signal strength
         .sum()
 
     fun solvePart2() = registerValues
