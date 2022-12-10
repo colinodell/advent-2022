@@ -26,13 +26,8 @@ class Day10(input: List<String>) {
         .sum()
 
     fun solvePart2() = registerValues
-        .foldIndexed("") { cycle, crt, x ->
-            if (abs((cycle % 40) - x) <2) {
-                crt + '█'
-            } else {
-                crt + ' '
-            }
-        }
+        .mapIndexed { cycle, x -> abs((cycle % 40) - x) < 2 } // Should the pixel be lit?
+        .fold("") { crt, lit -> crt + if (lit) "█" else " " } // Draw the pixel
         .chunked(40)
         .joinToString("\n")
 }
