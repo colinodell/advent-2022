@@ -10,13 +10,9 @@ class Day10(input: String) {
         .dropLast(1)
 
     fun solvePart1() = registerValues
-        .mapIndexed { cycle, x ->
-            if ((cycle + 1) % 40 == 20) {
-                (cycle + 1) * x
-            } else {
-                0
-            }
-        }
+        .let { listOf(0) + it } // Add a 0 at the beginning so everything is 1-indexed
+        .mapIndexed { cycle, x -> cycle * x } // Calculate the signal strength for every cycle
+        .filterIndexed { cycle, _ -> cycle % 40 == 20 } // Only take the cycles we're interested in
         .sum()
 
     fun solvePart2() = registerValues
