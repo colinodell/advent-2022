@@ -28,9 +28,9 @@ class Day10(input: List<String>) {
     fun solvePart2() = registerValues
         .foldIndexed("") { cycle, crt, x ->
             if (abs((cycle % 40) - x) <2) {
-                crt + '#'
+                crt + '█'
             } else {
-                crt + '.'
+                crt + ' '
             }
         }
         .chunked(40)
