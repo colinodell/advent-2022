@@ -15,25 +15,25 @@ class Day11(private val allMonkeys: List<Monkey>) {
             .sortedDescending()
             .take(2)
             .let { it[0] * it[1] }
-}
 
-data class Monkey(
-    val items: MutableList<Long>,
-    private val operation: (Long) -> Long,
-    val divisorTest: Long,
-    private val nextMonkeyIfTrue: Int,
-    private val nextMonkeyIfFalse: Int
-) {
-    var itemsInspected: Long = 0
+    data class Monkey(
+        val items: MutableList<Long>,
+        private val operation: (Long) -> Long,
+        val divisorTest: Long,
+        private val nextMonkeyIfTrue: Int,
+        private val nextMonkeyIfFalse: Int
+    ) {
+        var itemsInspected: Long = 0
 
-    fun inspectItems(otherMonkeys: List<Monkey>, modifier: (Long) -> Long) {
-        items
-            .map { modifier(operation(it)) }
-            .forEach { item ->
-                val nextMonkey = if (item % divisorTest == 0L) nextMonkeyIfTrue else nextMonkeyIfFalse
-                otherMonkeys[nextMonkey].items.add(item)
-                itemsInspected++
-            }
-        items.clear()
+        fun inspectItems(otherMonkeys: List<Monkey>, modifier: (Long) -> Long) {
+            items
+                .map { modifier(operation(it)) }
+                .forEach { item ->
+                    val nextMonkey = if (item % divisorTest == 0L) nextMonkeyIfTrue else nextMonkeyIfFalse
+                    otherMonkeys[nextMonkey].items.add(item)
+                    itemsInspected++
+                }
+            items.clear()
+        }
     }
 }
