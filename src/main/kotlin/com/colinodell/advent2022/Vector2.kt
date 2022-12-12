@@ -12,6 +12,13 @@ data class Vector2(val x: Int, val y: Int) {
     fun isTouching(other: Vector2) = abs(x - other.x) <= 1 && abs(y - other.y) <= 1
 
     override fun toString() = "($x, $y)"
+
+    fun neighbors() = listOf(
+        Vector2(x - 1, y),
+        Vector2(x + 1, y),
+        Vector2(x, y - 1),
+        Vector2(x, y + 1)
+    )
 }
 
 typealias Grid<T> = Map<Vector2, T>
@@ -25,6 +32,10 @@ fun <T> Grid<T>.pointsToThe(direction: Vector2, source: Vector2) = sequence {
     }
 }
 
+fun <T> Grid<T>.neighborsOf(point: Vector2): Map<Vector2, T> {
+    return point.neighbors().filter { containsKey(it) }.associateWith { get(it)!! }
+}
+
 fun <T> List<String>.toGrid(transform: (Char) -> T) = mutableMapOf<Vector2, T>().apply {
     forEachIndexed { y, line ->
         line.forEachIndexed { x, c ->
@@ -32,3 +43,5 @@ fun <T> List<String>.toGrid(transform: (Char) -> T) = mutableMapOf<Vector2, T>()
         }
     }
 }
+
+fun List<String>.toGrid() = toGrid { it }
