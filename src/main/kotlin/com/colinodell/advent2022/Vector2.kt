@@ -1,6 +1,7 @@
 package com.colinodell.advent2022
 
 import kotlin.math.abs
+import kotlin.math.max
 
 data class Vector2(val x: Int, val y: Int) {
     operator fun plus(other: Vector2) = Vector2(x + other.x, y + other.y)
@@ -19,6 +20,20 @@ data class Vector2(val x: Int, val y: Int) {
         Vector2(x, y - 1),
         Vector2(x, y + 1)
     )
+}
+
+// A line that is at some multiple of 45 degrees (horizontal, vertical, or diagonal)
+data class Line(val start: Vector2, val end: Vector2) {
+    val points: List<Vector2> by lazy {
+        val xDiff = end.x - start.x
+        val yDiff = end.y - start.y
+        val stepCount = max(abs(xDiff), abs(yDiff))
+
+        val xStep = xDiff / stepCount
+        val yStep = yDiff / stepCount
+
+        (0..stepCount).map { Vector2(start.x + it * xStep, start.y + it * yStep) }
+    }
 }
 
 typealias Grid<T> = Map<Vector2, T>
@@ -45,3 +60,9 @@ fun <T> List<String>.toGrid(transform: (Char) -> T) = mutableMapOf<Vector2, T>()
 }
 
 fun List<String>.toGrid() = toGrid { it }
+
+fun <T> Iterable<Vector2>.toGrid(valueGenerator: (Vector2) -> T) = mutableMapOf<Vector2, T>().apply {
+    forEachIndexed { _, v ->
+        put(v, valueGenerator(v))
+    }
+}
