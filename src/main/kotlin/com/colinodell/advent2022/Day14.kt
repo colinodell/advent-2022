@@ -20,11 +20,11 @@ class Day14(input: List<String>) {
 
     fun solvePart2() = dropAllSand(maxY + 2, null) + 1
 
-    private fun nextPositions(current: Vector2) = sequence {
-        yield(current + Vector2(0, 1))
-        yield(current + Vector2(-1, 1))
-        yield(current + Vector2(1, 1))
-    }
+    private fun nextPositions(current: Vector2) = listOf(
+        current + Vector2(0, 1),
+        current + Vector2(-1, 1),
+        current + Vector2(1, 1),
+    )
 
     /**
      * Continue dropping sand until we fall into the void or reach the source point
