@@ -12,6 +12,8 @@ data class Vector2(val x: Int, val y: Int) {
 
     fun isTouching(other: Vector2) = abs(x - other.x) <= 1 && abs(y - other.y) <= 1
 
+    fun manhattanDistanceTo(other: Vector2) = abs(x - other.x) + abs(y - other.y)
+
     override fun toString() = "($x, $y)"
 
     fun neighbors() = listOf(
