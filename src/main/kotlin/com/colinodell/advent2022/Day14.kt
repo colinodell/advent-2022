@@ -14,11 +14,11 @@ class Day14(input: List<String>) {
     }.toGrid { '#' }
 
     private val sandStart = Vector2(500, 0)
-    private val floorY = grid.keys.maxOf { it.y } + 2
+    private val maxY = grid.keys.maxOf { it.y }
 
     fun solvePart1(): Int {
         var sandUnits = 0
-        while (dropOneSandUnit(null)) {
+        while (dropOneSandUnit(null, maxY)) {
             sandUnits++
         }
         return sandUnits
@@ -27,7 +27,7 @@ class Day14(input: List<String>) {
     fun solvePart2(): Int {
         var sandUnits = 0
         while (!grid.keys.contains(sandStart)) {
-            dropOneSandUnit(floorY)
+            dropOneSandUnit(maxY + 2, null)
             sandUnits++
         }
         return sandUnits
@@ -42,15 +42,15 @@ class Day14(input: List<String>) {
     /**
      * Drop a single sand unit until it comes to a rest
      *
-     * @return true if the sand unit came to a rest, false if it fell into the abyss
+     * @return true if the sand unit came to a rest, false if it fell into the void
      */
-    private fun dropOneSandUnit(floor: Int?): Boolean {
+    private fun dropOneSandUnit(floorY: Int?, voidY: Int?): Boolean {
         var pos = sandStart
         while (true) {
             // Move the sand unit into the next position (down, down-left, or down-right), if able; break otherwise
-            pos = nextPositions(pos).firstOrNull { grid[it] == null && (floor == null || it.y < floor) } ?: break
-            // Have we fallen into the abyss?
-            if (floor == null && grid.none { it.key.x == pos.x && it.key.y > pos.y }) {
+            pos = nextPositions(pos).firstOrNull { grid[it] == null && (floorY == null || it.y < floorY) } ?: break
+            // Have we fallen into the void?
+            if (floorY == null && pos.y == voidY) {
                 return false
             }
         }
