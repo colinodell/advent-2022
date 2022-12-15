@@ -16,22 +16,9 @@ class Day14(input: List<String>) {
     private val sandStart = Vector2(500, 0)
     private val maxY = grid.keys.maxOf { it.y }
 
-    fun solvePart1(): Int {
-        var sandUnits = 0
-        while (dropOneSandUnit(null, maxY)) {
-            sandUnits++
-        }
-        return sandUnits
-    }
+    fun solvePart1() = dropAllSand(null, maxY)
 
-    fun solvePart2(): Int {
-        var sandUnits = 0
-        while (!grid.keys.contains(sandStart)) {
-            dropOneSandUnit(maxY + 2, null)
-            sandUnits++
-        }
-        return sandUnits
-    }
+    fun solvePart2() = dropAllSand(maxY + 2, null) + 1
 
     private fun nextPositions(current: Vector2) = sequence {
         yield(current + Vector2(0, 1))
@@ -40,21 +27,29 @@ class Day14(input: List<String>) {
     }
 
     /**
-     * Drop a single sand unit until it comes to a rest
-     *
-     * @return true if the sand unit came to a rest, false if it fell into the void
+     * Continue dropping sand until we fall into the void or reach the source point
      */
-    private fun dropOneSandUnit(floorY: Int?, voidY: Int?): Boolean {
+    private fun dropAllSand(floorY: Int?, voidY: Int?): Int {
         var pos = sandStart
+        var count = 0
         while (true) {
-            // Move the sand unit into the next position (down, down-left, or down-right), if able; break otherwise
-            pos = nextPositions(pos).firstOrNull { grid[it] == null && (floorY == null || it.y < floorY) } ?: break
-            // Have we fallen into the void?
-            if (floorY == null && pos.y == voidY) {
-                return false
+            val next = nextPositions(pos).firstOrNull { grid[it] == null }
+            pos = when {
+                // End condition 1: We fell into the void
+                next != null && next.y == voidY -> return count
+                // End condition 2: We reached the source point
+                next == null && pos == sandStart -> return count
+                // The sand unit is now at rest
+                next == null || next.y == floorY -> {
+                    // Record it
+                    grid[pos] = 'o'
+                    count++
+                    // Drop the next sand unit
+                    sandStart
+                }
+                // The sand unit is still falling
+                else -> next
             }
         }
-        grid[pos] = 'o'
-        return true
     }
 }
