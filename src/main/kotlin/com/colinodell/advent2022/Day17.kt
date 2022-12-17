@@ -19,40 +19,45 @@ class Day17(input: String) {
 
     fun solvePart1() = simulate(2022)
 
-    private fun simulate(rocks: Int): Int {
-        val grid = mutableSetOf<Vector2>()
-        var shapeIndex = 0
-        var jetIndex = 0
+    private fun simulate(rocksToDrop: Int): Int {
+        val fallenRocks = mutableSetOf<Vector2>()
+        var rocksDropped = 0
+        var jetIndex = -1
+        var highestPoint = 0
+
         repeat(rocks) {
-            var shape = shapes[shapeIndex++ % shapes.size]
             // The bottom edge should start three units above the highest rock in the room (or the floor, if there isn't one).
-            val highestPointInGrid = grid.maxOfOrNull { it.y } ?: 0
-            shape = shape.map { it + Vector2(2, highestPointInGrid + 4) }
+            var shape = shapes[rocksDropped % shapes.size].map { it + Vector2(2, highestPoint + 4) }
 
             while (true) {
                 // Move left/right with the jet pattern
-                val nextJetPattern = jetPattern[jetIndex++ % jetPattern.size]
-                var nextPoints = shape.map { it + nextJetPattern }
-                // Are we still in bounds and not overlapping anything?
-                if (nextPoints.all { it.x in 0..6 && it !in grid }) {
-                    shape = nextPoints
+                jetIndex = (jetIndex + 1) % jetPattern.size
+                var candidatePosition = shape.map { it + jetPattern[jetIndex] }
+                // Only move if there's no collision
+                if (!hasCollision(candidatePosition, fallenRocks)) {
+                    shape = candidatePosition
                 }
 
                 // Move downwards
-                nextPoints = shape.map { it + Vector2(0, -1) }
-                // Are we not overlapping anything?
-                if (nextPoints.all { it.y > 0 && it !in grid }) {
-                    shape = nextPoints
+                candidatePosition = shape.map { it + Vector2(0, -1) }
+                // Only move if there's no collision
+                if (!hasCollision(candidatePosition, fallenRocks)) {
+                    shape = candidatePosition
                 } else {
-                    // We've hit something, so we're done
-                    break
+                    break // We've hit something, so we're done with this rock
                 }
             }
 
-            // Add our points to the grid
-            grid.addAll(shape)
+            // Add this rock to our list of fallen rocks
+            rocksDropped++
+            fallenRocks.addAll(shape)
+            highestPoint = fallenRocks.maxOf { it.y }
         }
 
-        return grid.maxOf { it.y }
+        return highestPoint
+    }
+
+    private fun hasCollision(shape: List<Vector2>, grid: Set<Vector2>): Boolean {
+        return shape.any { it.x !in 0..6 || it.y <= 0 || it in grid }
     }
 }
