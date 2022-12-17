@@ -1,5 +1,7 @@
 package com.colinodell.advent2022
 
+import kotlin.math.min
+
 class Day17(input: String) {
     private val jetPattern = input.map {
         when (it) {
@@ -19,13 +21,25 @@ class Day17(input: String) {
 
     fun solvePart1() = simulate(2022)
 
-    private fun simulate(rocksToDrop: Int): Int {
+    fun solvePart2() = simulate(1000000000000)
+
+    private fun simulate(rocksToDrop: Long): Long {
         val fallenRocks = mutableSetOf<Vector2>()
         var rocksDropped = 0
         var jetIndex = -1
         var highestPoint = 0
 
-        repeat(rocks) {
+        val seenCycles = mutableSetOf<Int>()
+        var cycle: Cycle? = null
+        val heightAfterNDroppedRocks = mutableListOf<Int>()
+
+        // A cycle should be detected after (shape size * jet pattern size) iterations
+        val repetitions = min(
+            rocksToDrop,
+            (shapes.size * jetPattern.size).toLong()
+        )
+
+        repeat(repetitions.toInt()) {
             // The bottom edge should start three units above the highest rock in the room (or the floor, if there isn't one).
             var shape = shapes[rocksDropped % shapes.size].map { it + Vector2(2, highestPoint + 4) }
 
@@ -52,12 +66,41 @@ class Day17(input: String) {
             rocksDropped++
             fallenRocks.addAll(shape)
             highestPoint = fallenRocks.maxOf { it.y }
+
+            // Try to detect a cycle
+            // A cycle occurs when we continue seeing the same jet pattern index after dropping all five shapes
+            if (rocksDropped % shapes.size == 0) {
+                if (cycle == null) {
+                    // We have not yet seen a cycle, so record the current jet pattern index for next time
+                    if (!seenCycles.add(jetIndex)) {
+                        cycle = Cycle(jetIndex, shape[0].y, rocksDropped)
+                    }
+                } else if (cycle!!.index == jetIndex) {
+                    // The cycle is repeating!
+                    val cycleHeight = shape[0].y - cycle!!.yPosition
+                    val cycleSize = rocksDropped - cycle!!.rocksDropped
+
+                    val rocksToJumpOver = rocksToDrop - cycle!!.rocksDropped
+                    val cycleCount = rocksToJumpOver / cycleSize
+                    val extraRocks = (rocksToJumpOver % cycleSize).toInt()
+
+                    return (cycleCount * cycleHeight) + heightAfterNDroppedRocks[extraRocks]
+                }
+            }
+
+            // Record the height of the rocks after this rock was dropped
+            // We'll use this later when we detect a cycle
+            if (cycle != null) {
+                heightAfterNDroppedRocks.add(highestPoint)
+            }
         }
 
-        return highestPoint
+        return highestPoint.toLong()
     }
 
     private fun hasCollision(shape: List<Vector2>, grid: Set<Vector2>): Boolean {
         return shape.any { it.x !in 0..6 || it.y <= 0 || it in grid }
     }
+
+    private data class Cycle(val index: Int, val yPosition: Int, val rocksDropped: Int)
 }
