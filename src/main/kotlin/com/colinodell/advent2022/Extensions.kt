@@ -65,5 +65,3 @@ fun Iterable<IntRange>.simplify(): List<IntRange> {
 fun Iterable<IntRange>.clamp(min: Int, max: Int) =
     filter { it.first <= max && it.last >= min }
         .map { it.first.coerceAtLeast(min)..it.last.coerceAtMost(max) }
-
-fun <T> Sequence<T>.repeatForever() = generateSequence(this) { it }.flatten()
