@@ -19,20 +19,68 @@ class Day21(input: List<String>) {
             }
         }
 
-    fun solvePart1() = monkeys["root"]!!.yell()
+    private val root = monkeys["root"]!! as JobMonkey
 
+    fun solvePart1() = root.yell()
 
-    private interface Monkey {
-        fun yell(): Long
+    fun solvePart2(): Long {
+        val targetName = "humn"
+        val pathToTarget = mutableListOf<Monkey>().also { root.find(targetName, it) }
+
+        return when {
+            (root.left in pathToTarget) -> (root.left as JobMonkey).findNumberGiving(root.right.yell(), targetName, pathToTarget)
+            (root.right in pathToTarget) -> (root.right as JobMonkey).findNumberGiving(root.left.yell(), targetName, pathToTarget)
+            else -> error("No path to human")
+        }
     }
 
-    private class NumberMonkey(private val value: Long) : Monkey {
+    abstract class Monkey {
+        open lateinit var name: String
+        abstract fun yell(): Long
+
+        fun find(name: String, path: MutableList<Monkey>): Monkey? {
+            if (this.name == name) {
+                path.add(this)
+                return this
+            }
+
+            if (this is JobMonkey) {
+                left.find(name, path)?.let { path.add(this); return it }
+                right.find(name, path)?.let { path.add(this); return it }
+            }
+
+            return null
+        }
+
+        fun findNumberGiving(result: Long, targetName: String, pathToTarget: List<Monkey>): Long {
+            if (name == targetName) {
+                return result
+            }
+
+            this as JobMonkey
+            return when {
+                left in pathToTarget -> left.findNumberGiving(invertLeft(right.yell(), result), targetName, pathToTarget)
+                right in pathToTarget -> right.findNumberGiving(invertRight(left.yell(), result), targetName, pathToTarget)
+                else -> throw IllegalStateException("Couldn't find $targetName in $left or $right")
+            }
+        }
+    }
+
+    private class NumberMonkey(
+        override var name: String,
+        private val value: Long
+    ) : Monkey() {
         override fun yell() = value
     }
 
-    private class JobMonkey(private val leftName: String, private val rightName: String, private val operator: String) : Monkey {
-        private lateinit var left: Monkey
-        private lateinit var right: Monkey
+    private class JobMonkey(
+        override var name: String,
+        private val leftName: String,
+        private val rightName: String,
+        private val operator: String
+    ) : Monkey() {
+        lateinit var left: Monkey
+        lateinit var right: Monkey
 
         fun associate(monkeys: Map<String, Monkey>) {
             left = monkeys[leftName]!!
@@ -44,6 +92,22 @@ class Day21(input: List<String>) {
             "-" -> left.yell() - right.yell()
             "*" -> left.yell() * right.yell()
             "/" -> left.yell() / right.yell()
+            else -> throw IllegalArgumentException("Unknown operator: $operator")
+        }
+
+        fun invertLeft(right: Long, result: Long) = when (operator) {
+            "+" -> result - right
+            "-" -> result + right
+            "*" -> result / right
+            "/" -> result * right
+            else -> throw IllegalArgumentException("Unknown operator: $operator")
+        }
+
+        fun invertRight(left: Long, result: Long) = when (operator) {
+            "+" -> result - left
+            "-" -> left - result
+            "*" -> result / left
+            "/" -> left / result
             else -> throw IllegalArgumentException("Unknown operator: $operator")
         }
     }
