@@ -8,6 +8,14 @@ data class Vector2(val x: Int, val y: Int) {
 
     operator fun minus(other: Vector2) = Vector2(x - other.x, y - other.y)
 
+    operator fun times(scale: Int) = Vector2(x * scale, y * scale)
+
+    operator fun div(scale: Int) = Vector2(x / scale, y / scale)
+
+    operator fun rem(n: Int) = Vector2(x % n, y % n)
+
+    fun negativeSafeModulo(n: Int) = Vector2((x + n) % n, (y + n) % n)
+
     fun normalize() = Vector2(x.clamp(-1, 1), y.clamp(-1, 1))
 
     fun isTouching(other: Vector2) = abs(x - other.x) <= 1 && abs(y - other.y) <= 1
@@ -22,6 +30,47 @@ data class Vector2(val x: Int, val y: Int) {
         Vector2(x, y - 1),
         Vector2(x, y + 1)
     )
+}
+
+enum class Direction {
+    UP, DOWN, LEFT, RIGHT;
+
+    enum class Rotation {
+        LEFT, RIGHT
+    }
+
+    fun vector() = when (this) {
+        UP -> Vector2(0, -1)
+        DOWN -> Vector2(0, 1)
+        LEFT -> Vector2(-1, 0)
+        RIGHT -> Vector2(1, 0)
+    }
+
+    fun turn(rotation: Rotation) = when (rotation) {
+        Rotation.LEFT -> turnLeft()
+        Rotation.RIGHT -> turnRight()
+    }
+
+    fun turnLeft() = when (this) {
+        UP -> LEFT
+        DOWN -> RIGHT
+        LEFT -> DOWN
+        RIGHT -> UP
+    }
+
+    fun turnRight() = when (this) {
+        UP -> RIGHT
+        DOWN -> LEFT
+        LEFT -> UP
+        RIGHT -> DOWN
+    }
+
+    fun opposite() = when (this) {
+        UP -> DOWN
+        DOWN -> UP
+        LEFT -> RIGHT
+        RIGHT -> LEFT
+    }
 }
 
 // A line that is at some multiple of 45 degrees (horizontal, vertical, or diagonal)
