@@ -42,13 +42,6 @@ class Day22(input: List<String>) {
         var state = state
 
         for (i in 1..distance) {
-            grid[state.pos] = when (state.dir) {
-                Direction.RIGHT -> '>'
-                Direction.DOWN -> 'v'
-                Direction.LEFT -> '<'
-                Direction.UP -> '^'
-            }
-
             var nextState = State(state.pos + state.dir.vector(), state.dir)
             var peek = grid[nextState.pos]
 
