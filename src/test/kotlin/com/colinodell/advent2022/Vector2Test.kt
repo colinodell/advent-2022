@@ -183,3 +183,36 @@ class LineTest {
         )
     }
 }
+
+@Nested
+@DisplayName("Vector2 Collection")
+class CollectionTest {
+    private val collection: Set<Vector2> = setOf(
+        Vector2(0, 0),
+        Vector2(2, 0),
+        Vector2(1, 1),
+        Vector2(0, 2),
+        Vector2(2, 2),
+    )
+
+    @Test
+    fun `width()`() {
+        assertThat(collection.width()).isEqualTo(3)
+    }
+
+    @Test
+    fun `height()`() {
+        assertThat(collection.height()).isEqualTo(3)
+    }
+
+    @Test
+    fun `toStringVisualization()`() {
+        assertThat(collection.toStringVisualization()).isEqualTo(
+            """
+            #.#
+            .#.
+            #.#
+            """.trimIndent()
+        )
+    }
+}
