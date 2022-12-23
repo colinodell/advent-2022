@@ -10,8 +10,7 @@ class Day23(input: List<String>) {
             (elves.width() * elves.height()) - elves.count()
         }
 
-    fun solvePart2() = simulate()
-        .indexOfLast { true } + 2 // +1 because we're 0-indexed, and another +1 because our sequence excludes the next state where everything stays the same
+    fun solvePart2() = simulate().indexOfLast { true } + 2 // +1 because we're 0-indexed, and another +1 because our sequence excludes the next state where everything stays the same
 
     private fun simulate() = sequence {
         var elves = elves
@@ -46,17 +45,12 @@ class Day23(input: List<String>) {
         }
     }
 
-    // Generate a list of the cardinal directions along with their diagonals
-    private val dirsToConsider =
-        listOf(Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT)
-            .map { it.vector() }
-            .map {
-                when {
-                    it.x == 0 -> listOf(it, it + Vector2(1, 0), it + Vector2(-1, 0))
-                    it.y == 0 -> listOf(it, it + Vector2(0, 1), it + Vector2(0, -1))
-                    else -> error("Unexpected direction: $it")
-                }
-            }
+    private val proposalOffsets = listOf(
+        listOf(Vector2(0, -1), Vector2(-1, -1), Vector2(1, -1)), // North
+        listOf(Vector2(0, 1), Vector2(-1, 1), Vector2(1, 1)), // South
+        listOf(Vector2(-1, 0), Vector2(-1, -1), Vector2(-1, 1)), // West
+        listOf(Vector2(1, 0), Vector2(1, -1), Vector2(1, 1)) // East
+    )
 
     /**
      * Returns the direction the elf should move, or null if it should stay put
@@ -69,7 +63,7 @@ class Day23(input: List<String>) {
 
         // Consider each of the four directions (in the order we prefer this round)
         for (i in 0..3) {
-            val movesToConsider = dirsToConsider[(i + round) % 4]
+            val movesToConsider = proposalOffsets[(i + round) % 4]
 
             // Are any of these three spaces occupied?
             if (movesToConsider.none { elves.contains(currentPos + it) }) {
