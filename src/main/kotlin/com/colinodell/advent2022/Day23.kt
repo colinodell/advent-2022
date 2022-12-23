@@ -19,29 +19,44 @@ class Day23(input: List<String>) {
 
         while (true) {
             // First half
-            val proposedMoves = elves.associateWith { elf -> proposeNextMove(elf, elves, round) }
-            if (proposedMoves.all { it.value == null }) {
-                break
-            }
-            val proposedPositions = proposedMoves.mapValues { (current, move) -> move?.let { current + move } ?: current }
+            val proposedPositions = elves
+                .associateWith { elf -> proposeNextMove(elf, elves, round) }
+                .also { p ->
+                    if (p.all { it.value == null }) {
+                        // No moves to make, we're done!
+                        return@sequence
+                    }
+                }
+                .mapValues { (current, move) ->
+                    move?.let { current + move } ?: current
+                }
 
             // Second half
-            elves = mutableSetOf()
-            val countProposedPositions = proposedPositions.values.groupingBy { it }.eachCount()
-            proposedPositions.forEach { (originalPos, proposedPos) ->
-                if (countProposedPositions[proposedPos]!! > 1) {
-                    elves.add(originalPos)
+            val countAtPosition = proposedPositions.values.groupingBy { it }.eachCount()
+            elves = proposedPositions.map { (originalPos, proposedPos) ->
+                if (countAtPosition[proposedPos]!! > 1) {
+                    originalPos
                 } else {
-                    elves.add(proposedPos)
+                    proposedPos
                 }
-            }
+            }.toSet()
 
             yield(elves)
             round++
         }
     }
 
-    private val dirsToConsider = listOf(Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT)
+    // Generate a list of the cardinal directions along with their diagonals
+    private val dirsToConsider =
+        listOf(Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT)
+            .map { it.vector() }
+            .map {
+                when {
+                    it.x == 0 -> listOf(it, it + Vector2(1, 0), it + Vector2(-1, 0))
+                    it.y == 0 -> listOf(it, it + Vector2(0, 1), it + Vector2(0, -1))
+                    else -> error("Unexpected direction: $it")
+                }
+            }
 
     /**
      * Returns the direction the elf should move, or null if it should stay put
@@ -54,20 +69,12 @@ class Day23(input: List<String>) {
 
         // Consider each of the four directions (in the order we prefer this round)
         for (i in 0..3) {
-            val dirToConsider = dirsToConsider[(i + round) % 4].vector()
-            // Generate the diagonal moves too
-            val dirsToInspect = when {
-                dirToConsider.x == 0 -> listOf(dirToConsider, dirToConsider + Vector2(1, 0), dirToConsider + Vector2(-1, 0))
-                dirToConsider.y == 0 -> listOf(dirToConsider, dirToConsider + Vector2(0, 1), dirToConsider + Vector2(0, -1))
-                else -> throw IllegalStateException("Unexpected direction: $dirToConsider")
-            }
+            val movesToConsider = dirsToConsider[(i + round) % 4]
 
             // Are any of these three spaces occupied?
-            if (dirsToInspect.any { elves.contains(currentPos + it) }) {
-                continue
+            if (movesToConsider.none { elves.contains(currentPos + it) }) {
+                return movesToConsider[0]
             }
-
-            return dirToConsider
         }
 
         return null
