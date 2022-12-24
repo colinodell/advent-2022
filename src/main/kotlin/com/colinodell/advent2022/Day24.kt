@@ -53,9 +53,7 @@ class Day24(input: List<String>) {
                     continue
                 }
 
-                if (next !in queue) {
-                    queue.add(next)
-                }
+                queue.add(next)
             }
         }
 
