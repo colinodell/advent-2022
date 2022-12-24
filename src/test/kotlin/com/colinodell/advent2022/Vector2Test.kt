@@ -90,6 +90,13 @@ class Vector2Test {
         assertThat(Vector2(0, 0).isTouching(Vector2(0, 2))).isFalse
         assertThat(Vector2(0, 0).isTouching(Vector2(2, 2))).isFalse
     }
+
+    @Test
+    fun `Manhattan Distance`() {
+        assertThat(Vector2(0, 0).manhattanDistanceTo(Vector2(0, 0))).isEqualTo(0)
+        assertThat(Vector2(0, 0).manhattanDistanceTo(Vector2(3, 2))).isEqualTo(5)
+        assertThat(Vector2(-1, -1).manhattanDistanceTo(Vector2(1, 1))).isEqualTo(4)
+    }
 }
 
 @Nested

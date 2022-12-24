@@ -78,6 +78,16 @@ enum class Direction {
         LEFT -> RIGHT
         RIGHT -> LEFT
     }
+
+    companion object {
+        fun from(c: Char): Direction = when (c) {
+            '^' -> UP
+            'v' -> DOWN
+            '<' -> LEFT
+            '>' -> RIGHT
+            else -> throw IllegalArgumentException("Unknown direction: $c")
+        }
+    }
 }
 
 // A line that is at some multiple of 45 degrees (horizontal, vertical, or diagonal)
@@ -94,6 +104,12 @@ data class Line(val start: Vector2, val end: Vector2) {
     }
 }
 
+data class Region(val topLeft: Vector2, val bottomRight: Vector2) {
+    operator fun contains(point: Vector2): Boolean = point.x in topLeft.x..bottomRight.x && point.y in topLeft.y..bottomRight.y
+
+    fun contract(amount: Int) = Region(topLeft + Vector2(amount, amount), bottomRight - Vector2(amount, amount))
+}
+
 typealias Grid<T> = Map<Vector2, T>
 data class GridEntry<V>(override val key: Vector2, override val value: V?) : Map.Entry<Vector2, V?>
 
@@ -108,6 +124,10 @@ fun <T> Grid<T>.pointsToThe(direction: Vector2, source: Vector2) = sequence {
 fun <T> Grid<T>.neighborsOf(point: Vector2): Map<Vector2, T> {
     return point.neighbors().filter { containsKey(it) }.associateWith { get(it)!! }
 }
+
+fun <T> Grid<T>.topLeft() = Vector2(keys.minOf { it.x }, keys.minOf { it.y })
+fun <T> Grid<T>.bottomRight() = Vector2(keys.maxOf { it.x }, keys.maxOf { it.y })
+fun <T> Grid<T>.region() = Region(topLeft(), bottomRight())
 
 fun Collection<Vector2>.width() = maxOf { it.x } - minOf { it.x } + 1
 fun Collection<Vector2>.height() = maxOf { it.y } - minOf { it.y } + 1
