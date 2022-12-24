@@ -7,6 +7,7 @@ class Day24(input: List<String>) {
     private val innerRegion = grid.region().contract(1)
     private val start = grid.toList().first { it.first.y == 0 && it.second == '.' }.first
     private val goal = grid.toList().first { it.first.y > innerRegion.bottomRight.y && it.second == '.' }.first
+    private val roundTripEstimate = start.manhattanDistanceTo(goal)
 
     fun solvePart1() = solve(listOf(goal))
     fun solvePart2() = solve(listOf(goal, start, goal))
@@ -14,13 +15,18 @@ class Day24(input: List<String>) {
     private fun solve(goals: List<Vector2>): Int {
         val initialState = State(start, 0, 0)
 
-        val h = fun (s: State) = run {
-            val remainingGoals = goals.subList(s.goalIndex + 1, goals.size)
-            s.time + s.pos.manhattanDistanceTo(goals[s.goalIndex]) + remainingGoals.zipWithNext().sumOf { (a, b) -> a.manhattanDistanceTo(b) }
-        }
-
-        val queue = PriorityQueue<State>(compareBy { h(it) })
+        val queue = PriorityQueue<State>(
+            compareBy { s ->
+                // Our heuristic is basically the sum of:
+                //   1. The time spent so far
+                //   2. The distance to the current goal
+                //   3. The distance between any remaining goals
+                // Parts 2 and 3 of this are multiplied by 2 since there's a higher likelihood of needing to wait or backtrack
+                s.time + 2 * (s.pos.manhattanDistanceTo(goals[s.goalIndex]) + roundTripEstimate * (goals.size - s.goalIndex - 1))
+            }
+        )
         queue.add(State(start, 0, 0))
+
         val visited = mutableSetOf(initialState)
         while (queue.isNotEmpty()) {
             val current = queue.poll()
