@@ -72,43 +72,33 @@ class Day24(input: List<String>) {
 
     private data class Blizzard(val pos: Vector2, val dir: Direction)
 
-    private val blizzardCache = mutableListOf<Set<Blizzard>>().apply {
-        add(
-            grid
-                .filter { it.value in setOf('<', '>', 'v', '^') }
-                .map { (p, c) -> Blizzard(p, Direction.from(c)) }
-                .toSet()
-        )
-    }
-    private val blizzardPositionCache = mutableListOf(blizzardCache[0].map { it.pos }.toSet())
-
-    private fun blizzardsAt(desiredTime: Int): Set<Vector2> {
-        if (desiredTime < blizzardCache.size) {
-            return blizzardPositionCache[desiredTime]
+    private val blizzardPositionCache = mutableListOf<Set<Vector2>>()
+    private fun blizzardsAt(time: Int): Set<Vector2> {
+        while (blizzardPositionCache.size <= time) {
+            blizzardPositionCache.add(blizzardGenerator.next())
         }
+        return blizzardPositionCache[time]
+    }
 
-        var time = blizzardCache.lastIndex
-        var blizzards = blizzardCache.last()
-        while (time <= desiredTime) {
-            time++
+    private val blizzardGenerator = sequence {
+        var blizzards = grid
+            .filter { it.value in setOf('<', '>', 'v', '^') }
+            .map { (p, c) -> Blizzard(p, Direction.from(c)) }
+
+        while (true) {
+            yield(blizzards.map { it.pos }.toSet())
+
             blizzards = blizzards.map { b ->
                 val nextPos = b.pos + b.dir.vector()
-                if (nextPos in innerRegion) {
-                    Blizzard(nextPos, b.dir)
-                } else {
-                    val newPos = when (b.dir) {
-                        Direction.UP -> Vector2(b.pos.x, innerRegion.bottomRight.y)
-                        Direction.DOWN -> Vector2(b.pos.x, innerRegion.topLeft.y)
-                        Direction.LEFT -> Vector2(innerRegion.bottomRight.x, b.pos.y)
-                        Direction.RIGHT -> Vector2(innerRegion.topLeft.x, b.pos.y)
-                    }
-                    Blizzard(newPos, b.dir)
+                when {
+                    nextPos in innerRegion -> Blizzard(nextPos, b.dir)
+                    b.dir == Direction.UP -> Blizzard(nextPos.withY(innerRegion.bottomRight.y), b.dir)
+                    b.dir == Direction.DOWN -> Blizzard(nextPos.withY(innerRegion.topLeft.y), b.dir)
+                    b.dir == Direction.LEFT -> Blizzard(nextPos.withX(innerRegion.bottomRight.x), b.dir)
+                    b.dir == Direction.RIGHT -> Blizzard(nextPos.withX(innerRegion.topLeft.x), b.dir)
+                    else -> error("Invalid direction: ${b.dir}")
                 }
-            }.toSet()
-            blizzardCache.add(blizzards)
-            blizzardPositionCache.add(blizzards.map { it.pos }.toSet())
+            }
         }
-
-        return blizzardPositionCache[desiredTime]
-    }
+    }.iterator()
 }

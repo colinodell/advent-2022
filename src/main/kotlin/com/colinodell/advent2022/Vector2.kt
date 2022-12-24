@@ -37,6 +37,9 @@ data class Vector2(val x: Int, val y: Int) {
         Vector2(x + 1, y - 1),
         Vector2(x + 1, y + 1)
     )
+
+    fun withX(x: Int) = Vector2(x, y)
+    fun withY(y: Int) = Vector2(x, y)
 }
 
 enum class Direction {

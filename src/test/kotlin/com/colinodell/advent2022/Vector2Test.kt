@@ -97,6 +97,18 @@ class Vector2Test {
         assertThat(Vector2(0, 0).manhattanDistanceTo(Vector2(3, 2))).isEqualTo(5)
         assertThat(Vector2(-1, -1).manhattanDistanceTo(Vector2(1, 1))).isEqualTo(4)
     }
+
+    @Test
+    fun `With X`() {
+        val vector = Vector2(1, 2)
+        assertThat(vector.withX(3)).isEqualTo(Vector2(3, 2))
+    }
+
+    @Test
+    fun `With Y`() {
+        val vector = Vector2(1, 2)
+        assertThat(vector.withY(3)).isEqualTo(Vector2(1, 3))
+    }
 }
 
 @Nested
