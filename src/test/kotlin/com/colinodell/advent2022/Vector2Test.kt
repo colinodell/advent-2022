@@ -170,6 +170,9 @@ class LineTest {
             Vector2(1, 2),
             Vector2(1, 3),
         )
+        assertThat(line.isHorizontal).isFalse()
+        assertThat(line.isVertical).isTrue()
+        assertThat(line.isDiagonal).isFalse()
     }
 
     @Test
@@ -180,6 +183,9 @@ class LineTest {
             Vector2(8, 7),
             Vector2(7, 7),
         )
+        assertThat(line.isHorizontal).isTrue()
+        assertThat(line.isVertical).isFalse()
+        assertThat(line.isDiagonal).isFalse()
     }
 
     @Test
@@ -190,6 +196,9 @@ class LineTest {
             Vector2(2, 2),
             Vector2(3, 3),
         )
+        assertThat(line.isHorizontal).isFalse()
+        assertThat(line.isVertical).isFalse()
+        assertThat(line.isDiagonal).isTrue()
     }
 
     @Test
@@ -199,6 +208,33 @@ class LineTest {
             Vector2(9, 7),
             Vector2(8, 8),
             Vector2(7, 9),
+        )
+
+        assertThat(line.isHorizontal).isFalse()
+        assertThat(line.isVertical).isFalse()
+        assertThat(line.isDiagonal).isTrue()
+    }
+}
+
+@Nested
+@DisplayName("Grid")
+class GridTest {
+    @Test
+    fun `toStringVisualization()`() {
+        val grid: Grid<Char> = mapOf(
+            Pair(Vector2(0, 0), 'a'),
+            Pair(Vector2(2, 0), 'b'),
+            Pair(Vector2(1, 1), 'c'),
+            Pair(Vector2(0, 2), 'd'),
+            Pair(Vector2(2, 2), 'e'),
+        )
+
+        assertThat(grid.toStringVisualization()).isEqualTo(
+            """
+            a b
+             c 
+            d e
+            """.trimIndent()
         )
     }
 }

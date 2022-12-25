@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class InputsTest {
-
     @Nested
     inner class InputAsTextTests {
         @Test

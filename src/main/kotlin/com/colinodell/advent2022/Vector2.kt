@@ -105,6 +105,10 @@ data class Line(val start: Vector2, val end: Vector2) {
 
         (0..stepCount).map { Vector2(start.x + it * xStep, start.y + it * yStep) }
     }
+
+    val isHorizontal: Boolean by lazy { start.y == end.y }
+    val isVertical: Boolean by lazy { start.x == end.x }
+    val isDiagonal: Boolean by lazy { ! (isHorizontal || isVertical) }
 }
 
 data class Region(val topLeft: Vector2, val bottomRight: Vector2) {
@@ -127,10 +131,15 @@ fun <T> Grid<T>.pointsToThe(direction: Vector2, source: Vector2) = sequence {
 fun <T> Grid<T>.neighborsOf(point: Vector2): Map<Vector2, T> {
     return point.neighbors().filter { containsKey(it) }.associateWith { get(it)!! }
 }
+fun <T> Grid<T>.neighborsIncludingDiagonalsOf(point: Vector2): Map<Vector2, T> {
+    return point.neighborsIncludingDiagonals().filter { containsKey(it) }.associateWith { get(it)!! }
+}
 
 fun <T> Grid<T>.topLeft() = Vector2(keys.minOf { it.x }, keys.minOf { it.y })
 fun <T> Grid<T>.bottomRight() = Vector2(keys.maxOf { it.x }, keys.maxOf { it.y })
 fun <T> Grid<T>.region() = Region(topLeft(), bottomRight())
+fun <T> Grid<T>.width() = keys.maxOf { it.x } - keys.minOf { it.x } + 1
+fun <T> Grid<T>.height() = keys.maxOf { it.y } - keys.minOf { it.y } + 1
 
 fun Collection<Vector2>.width() = maxOf { it.x } - minOf { it.x } + 1
 fun Collection<Vector2>.height() = maxOf { it.y } - minOf { it.y } + 1
@@ -147,7 +156,22 @@ fun Collection<Vector2>.toStringVisualization(): String {
         grid[point.y - minY][point.x - minX] = '#'
     }
 
-    return grid.map { it.joinToString("") }.joinToString("\n")
+    return grid.joinToString("\n") { it.joinToString("") }
+}
+
+fun <T> Grid<T>.toStringVisualization(): String {
+    val minX = minOf { it.key.x }
+    val minY = minOf { it.key.y }
+    val maxX = maxOf { it.key.x }
+    val maxY = maxOf { it.key.y }
+
+    val grid = Array(maxY - minY + 1) { Array(maxX - minX + 1) { ' ' } }
+
+    for (point in this) {
+        grid[point.key.y - minY][point.key.x - minX] = point.value.toString()[0]
+    }
+
+    return grid.joinToString("\n") { it.joinToString("") }
 }
 
 fun <T> List<String>.toGrid(transform: (Char) -> T) = mutableMapOf<Vector2, T>().apply {
